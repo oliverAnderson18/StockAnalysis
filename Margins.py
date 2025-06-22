@@ -9,6 +9,7 @@ class Margins():
     """
     def __init__(self, asset: Asset):
         self.ticker = asset.ticker
+        self.signals = []
         self.growth = 0
         self.gross_margin = 0
         self.ebit_margin = 0
