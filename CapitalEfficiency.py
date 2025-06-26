@@ -14,6 +14,8 @@ class CapitalEfficiency():
         self.ROIC = 0
         self.WACC = 0
         self.spread = 0
+        self.ROE = 0
+        self.AT = 0
         
     
     def calculate_ROIC(self) -> None:
@@ -102,6 +104,38 @@ class CapitalEfficiency():
         spread = self.ROIC - self.WACC
         self.spread = spread
         
+    def calculate_ROE(self) -> None:
+        """
+        Results of the division between the net income of an asset divided by the equity.
+        ROE measures the efficiency of the investments made with the shareholders investments.
+        """
+        tkr = yf.Ticker(self.ticker)
+        stmt = tkr.income_stmt
+        bs = tkr.balancesheet
+        
+        equity = bs.loc["Common Stock Equity"].iloc[0]
+        net_income = stmt.loc["Net Income"].iloc[0]
+        
+        ROE = (net_income/equity) * 100
+        self.ROE = ROE
+    
+    
+    def calculate_asset_turnover(self) -> None:
+        """
+        We calculate all revenue and divide it by the total of assets. This is 
+        used for measuring how efficiently a company uses its assets to generate sells.
+        """
+        tkr = yf.Ticker(self.ticker)
+        stmt = tkr.income_stmt
+        bs = tkr.balance_sheet
+        
+        revenue = stmt.loc["Total Revenue"].iloc[0]
+        assets = bs.loc["Total Assets"].iloc[0]
+        
+        asset_turnover = revenue/assets
+        self.AT = asset_turnover
+            
+        
         
     def signals_capital_efficiency(self) -> list:
         """
@@ -110,15 +144,18 @@ class CapitalEfficiency():
         a decent estimate for a mature asset.
         """
         self.calculate_spread()
+        self.calculate_ROE()
+        self.calculate_asset_turnover()
         
         self.signals = [
              calculate_signal(self.spread,
-                              -10, -3, 3, 10)
+                              -10, -3, 3, 10),
+             calculate_signal(self.ROE, 
+                              5, 10, 15, 20),
+             calculate_signal(self.AT,
+                              0.25, 0.5, 1, 2)
+             
         ]
         
         return self.signals
         
-
-asset = Asset("MSFT", [])
-ce = CapitalEfficiency(asset)
-print(ce.signals_capital_efficiency())
