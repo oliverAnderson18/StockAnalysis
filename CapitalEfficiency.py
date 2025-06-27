@@ -33,9 +33,9 @@ class CapitalEfficiency():
             stmt = inc.loc[idx]
             bs = bal.loc[idx]
             
-            ebit = stmt.loc["EBIT"] # Earnings before interests and tax
+            ebit = stmt.loc["EBIT"] 
             tax_rate = stmt.loc["Tax Provision"]/stmt.loc["Pretax Income"]
-            nopat = ebit * (1-tax_rate) # Net operating profit after tax
+            nopat = ebit * (1-tax_rate) 
             
             equity = bs.loc["Common Stock Equity"]
             debt = bs.loc["Total Debt"]
