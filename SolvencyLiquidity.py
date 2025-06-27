@@ -14,6 +14,7 @@ class SolvencyLiquidity():
         self.signals = []
         self.NDEBITDA_ratio = 0
         self.interest_coverage = 0
+        self.current_ratio = 0
     
     
     def calculate_net_debt_to_EBITDA_ratio(self) -> None:
@@ -75,9 +76,44 @@ class SolvencyLiquidity():
 
         interest_coverage = ebit / interest_expense
         self.interest_coverage = interest_coverage
+        
+    
+    def calculate_current_ratio(self) -> None:
+        """
+        We calculate the current ratio by dividing the current assets by the current
+        liabilities. This measures a company's ability to pay off its short term liabilities.
+        """
+        tkr = yf.Ticker(self.ticker)
+        bs = tkr.balance_sheet
+        
+        assets = bs.loc["Current Assets"].iloc[0]
+        liabilites = bs.loc["Current Liabilities"].iloc[0]
+        
+        current_ratio = assets/liabilites
+        self.current_ratio = current_ratio
+        
+    
+    def calculate_signal_current_ratio(self) -> None:
+        """
+        The current ratio works a different from the other variables, 
+        so we have to create our own function to analyze what signal
+        it gives us.
+        """
+        self.calculate_current_ratio()
+        
+        if self.current_ratio < 1:
+            return "Strong Sell"
+        elif self.current_ratio < 1.5:
+            return "Neutral"
+        elif self.current_ratio < 2:
+            return "Moderate Buy"
+        elif self.current_ratio < 3:
+            return "Strong Buy"
+        elif self.current_ratio > 3:
+            return "Moderate Sell"
     
     
-    def signals_capital_efficiency(self) -> list:
+    def signals_solvency_liquidity(self) -> list:
         """
         We calculate all solvency and liquidity analysis variables and estimate if its 
         in a strong/moderate/neutral buy/sell.These estimations are not rigid, but are 
@@ -90,16 +126,13 @@ class SolvencyLiquidity():
              calculate_signal(-self.NDEBITDA_ratio,
                               -4, -3, -2, -1),
              calculate_signal(self.interest_coverage,
-                              1.5, 3, 5, 8)
+                              1.5, 3, 5, 8),
+             self.calculate_signal_current_ratio()
         ]
         
         return self.signals
-    
-    
-    def calculate_current_ratio(self) -> None:
-        
-        
+              
 
 asset = Asset("AAPL", [])
 SL = SolvencyLiquidity(asset)
-print(SL.signals_capital_efficiency())
+print(SL.signals_solvency_liquidity())
