@@ -131,8 +131,4 @@ class SolvencyLiquidity():
         ]
         
         return self.signals
-              
-
-asset = Asset("AAPL", [])
-SL = SolvencyLiquidity(asset)
-print(SL.signals_solvency_liquidity())
+    

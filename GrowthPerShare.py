@@ -46,9 +46,6 @@ class GrowthPerShare():
         free_cash_flow = tkr.cash_flow.loc["Free Cash Flow"]
         basic_avg_shares = stmt.loc["Basic Average Shares"]
         
-        print(free_cash_flow)
-        print(basic_avg_shares)
-        
         current_fcf = free_cash_flow.iloc[0]
         previous_fcf = free_cash_flow.iloc[1]
         
